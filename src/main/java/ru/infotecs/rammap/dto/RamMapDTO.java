@@ -2,7 +2,6 @@ package ru.infotecs.rammap.dto;
 
 import lombok.Getter;
 import lombok.Setter;
-import ru.infotecs.rammap.entity.RamObject;
 
 import java.util.Map;
 
