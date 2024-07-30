@@ -21,6 +21,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for the ProcessController class.
+ */
 public class ProcessControllerTest {
 
     @Mock
@@ -29,11 +32,17 @@ public class ProcessControllerTest {
     @InjectMocks
     private ProcessController processController;
 
+    /**
+     * Initializes mock objects before each test.
+     */
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
+    /**
+     * Tests the success scenario of the get method.
+     */
     @Test
     void testGet_Success() {
         String key = "testKey";
@@ -44,6 +53,9 @@ public class ProcessControllerTest {
         verify(ramMapService, times(1)).get(key);
     }
 
+    /**
+     * Tests the scenario where the get method returns not found.
+     */
     @Test
     void testGet_NotFound() {
         String key = "testKey";
@@ -53,6 +65,9 @@ public class ProcessControllerTest {
         verify(ramMapService, times(1)).get(key);
     }
 
+    /**
+     * Tests the success scenario of the set method.
+     */
     @Test
     void testSet_Success() {
         RamPairDTO ramPairDTO = new RamPairDTO();
@@ -62,6 +77,9 @@ public class ProcessControllerTest {
         verify(ramMapService, times(1)).set(ramPairDTO);
     }
 
+    /**
+     * Tests the failure scenario of the set method.
+     */
     @Test
     void testSet_Failure() {
         RamPairDTO ramPairDTO = new RamPairDTO();
@@ -71,6 +89,9 @@ public class ProcessControllerTest {
         verify(ramMapService, times(1)).set(ramPairDTO);
     }
 
+    /**
+     * Tests the success scenario of the remove method.
+     */
     @Test
     void testRemove_Success() {
         String key = "testKey";
@@ -81,6 +102,9 @@ public class ProcessControllerTest {
         verify(ramMapService, times(1)).remove(key);
     }
 
+    /**
+     * Tests the scenario where the remove method returns not found.
+     */
     @Test
     void testRemove_NotFound() {
         String key = "testKey";
@@ -90,6 +114,9 @@ public class ProcessControllerTest {
         verify(ramMapService, times(1)).remove(key);
     }
 
+    /**
+     * Tests the success scenario of the dump method.
+     */
     @Test
     void testDump_Success() {
         File file = new File("test.txt");
@@ -100,6 +127,9 @@ public class ProcessControllerTest {
         verify(ramMapService, times(1)).dump();
     }
 
+    /**
+     * Tests the failure scenario of the dump method.
+     */
     @Test
     void testDump_Failure() {
         when(ramMapService.dump()).thenReturn(null);
@@ -108,6 +138,9 @@ public class ProcessControllerTest {
         verify(ramMapService, times(1)).dump();
     }
 
+    /**
+     * Tests the success scenario of the load method.
+     */
     @Test
     void testLoad_Success() {
         MockMultipartFile mockFile = new MockMultipartFile(
@@ -123,6 +156,9 @@ public class ProcessControllerTest {
         verify(ramMapService, times(1)).load(mockFile);
     }
 
+    /**
+     * Tests the failure scenario of the load method.
+     */
     @Test
     void testLoad_Failure() {
         MockMultipartFile mockFile = new MockMultipartFile(

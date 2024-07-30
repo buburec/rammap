@@ -17,7 +17,6 @@ import java.io.File;
 
 /**
  * The {@code ProcessController} class handles HTTP requests related to RAM data processing.
- * <p>
  * This controller provides endpoints for CRUD operations on RAM data:
  * <ul>
  *     <li>Retrieving data by key</li>
@@ -26,7 +25,6 @@ import java.io.File;
  *     <li>Dumping all data to a file</li>
  *     <li>Loading data from a file</li>
  * </ul>
- * </p>
  *
  * @see RamMapService
  * @see RamMapDTO

@@ -17,6 +17,7 @@
     <properties>
         <java.version>17</java.version>
         <spring-boot.version>2.6.0</spring-boot.version>
+        <springframework.version>5.3.9</springframework.version>
         <lombok.version>1.18.30</lombok.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <springdoc.version>1.6.3</springdoc.version>
@@ -26,12 +27,23 @@
     </properties>
 
     <dependencies>
-        <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <version>${springframework.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>${springframework.version}</version>
         </dependency>
     </dependencies>
 
