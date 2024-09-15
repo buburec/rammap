@@ -1,11 +1,15 @@
 package ru.infotecs.rammap.entity;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveTask;
+import java.util.stream.Collectors;
 
 /**
  * Represents a concurrent in-memory map for storing RAM objects with expiration handling.
@@ -77,15 +81,56 @@ public class RamMap {
      */
     public void expire() {
         if (!this.ramObjectMap.keySet().isEmpty()) {
-            for (String key : this.ramObjectMap.keySet()) {
-                RamObject ramObject = this.ramObjectMap.get(key);
-                int timeToLive = ramObject.getTimeToLive() - 1;
-                if (RamMap.isTtlExpired(timeToLive)) {
-                    this.ramObjectMap.remove(key);
-                } else {
-                    ramObject.setTimeToLive(timeToLive);
+            ForkJoinPool forkJoinPool = new ForkJoinPool();
+            forkJoinPool.invoke(new ExpireTask(this.ramObjectMap));
+        }
+    }
+
+    /**
+     * Private static inner class representing the task for expiring RAM objects.
+     * Extends RecursiveTask to allow parallel execution in a ForkJoinPool.
+     */
+    @RequiredArgsConstructor
+    private static class ExpireTask extends RecursiveTask<Void> {
+        private static final int THRESHOLD = 10;
+        private final Map<String, RamObject> ramObjectMap;
+
+        /**
+         * Computes the task to expire RAM objects based on their TTL.
+         * If the size of the map is below the threshold, it processes sequentially.
+         * Otherwise, it splits the task into two subtasks for parallel processing.
+         *
+         * @return null (as this is a Void task).
+         */
+        @Override
+        protected Void compute() {
+            if (this.ramObjectMap.size() <= ExpireTask.THRESHOLD) {
+                for (String key : this.ramObjectMap.keySet()) {
+                    RamObject ramObject = this.ramObjectMap.get(key);
+                    int timeToLive = ramObject.getTimeToLive() - 1;
+                    if (RamMap.isTtlExpired(timeToLive)) {
+                        this.ramObjectMap.remove(key);
+                    } else {
+                        ramObject.setTimeToLive(timeToLive);
+                    }
                 }
+            } else {
+                int middle = this.ramObjectMap.size() / 2;
+                Map<String, RamObject> firstHalf = this.ramObjectMap
+                        .entrySet()
+                        .stream()
+                        .limit(middle)
+                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                Map<String, RamObject> secondHalf = this.ramObjectMap
+                        .entrySet()
+                        .stream()
+                        .skip(middle)
+                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                ExpireTask firstTask = new ExpireTask(firstHalf);
+                ExpireTask secondTask = new ExpireTask(secondHalf);
+                ExpireTask.invokeAll(firstTask, secondTask);
             }
+            return null;
         }
     }
 
